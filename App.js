@@ -17,6 +17,8 @@ const initialState = {
   ]
 }
 
+const HorizontalRule = () => <View style={styles.hr} />
+
 const Article = ({source}) => {
   const {title, date, content} = source
   return (
@@ -48,7 +50,10 @@ export default class App extends React.Component {
   state = { articles: initialState.articles }
 
   updateSearch (text) {
-    const nextArticles = this.state.articles.filter(a => a.title.toLowerCase().includes(text.toLowerCase()))
+    const matchesQuery = (a) => a.title
+      .toLowerCase()
+      .includes(text.toLowerCase())
+    const nextArticles = this.state.articles.filter(matchesQuery)
     this.setState({
       articles: (text && text.length) ? nextArticles : initialState.articles
     })
@@ -59,7 +64,7 @@ export default class App extends React.Component {
       <SafeAreaView style={styles.container}>
         <SearchBar onSearchUpdated={this.updateSearch.bind(this)} />
         <HorizontalRule />
-        <Text style={this.state.articles.length ? {} : styles.article}>No matches...</Text>
+        <Text style={this.state.articles.length && styles.hidden}>No matches found.</Text>
         <FlatList
           data={this.state.articles}
           renderItem={({item}) => <Article source={item} />}
@@ -70,7 +75,6 @@ export default class App extends React.Component {
   }
 }
 
-const HorizontalRule = () => <View style={styles.hr} />
 
 const styles = StyleSheet.create({
   container: {
