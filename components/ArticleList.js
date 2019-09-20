@@ -8,10 +8,15 @@ import React, { useEffect }   from 'react';
 import { initArticles } from '../redux/actionCreators'
 import Hooks, {} from '../hooks/'
 
+const showIf = (style, predicate) => {
+  return predicate ? style : ''
+}
 
 const ArticleList = ({initArticles}) => {
     const [articles, pending] = Hooks.useSharedState(state => state.articles)
     const [isHidden, updateFilter, hiddenSet] = Hooks.useFilter(articles, a => a.title)
+
+    const allArticlesHidden = () => (hiddenSet.size === articles.length)
 
     useEffect(() => { initArticles() }, [])
 
@@ -21,7 +26,7 @@ const ArticleList = ({initArticles}) => {
             <View style={ pending && styles.hidden }>
               <SearchBar onSearchUpdated={updateFilter} />
               <HorizontalRule />
-              <Text style={ (hiddenSet.size === articles.length) ? '' : styles.hidden}>No matches found.</Text>
+              { allArticlesHidden() && <Text>No matches found.</Text>}
               <FlatList
                   data={Object.values(articles)}
                   renderItem={({item}) => !isHidden(item) ? <Article source={item} /> : null}
